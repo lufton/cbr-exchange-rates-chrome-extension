@@ -1,9 +1,5 @@
-const
-    currencyNumberCode = 978;
-    currencyName = "EUR"
-    updateInterval = 60 * 60 * 1000;
-
-let lastExchangeRate = 0;
+const updateInterval = 60 * 60 * 1000;
+let config;
 
 chrome.action.onClicked.addListener(() => {
     update();
@@ -14,9 +10,13 @@ chrome.runtime.onMessage.addListener(message => {
 
     switch (message.type) {
         case 'exchange-rate':
-            if (lastExchangeRate) chrome.action.setBadgeBackgroundColor({color: message.data > lastExchangeRate ? [0, 150, 0, 150] : [255, 0, 0, 255] });
-            chrome.action.setBadgeText({text: `${message.data}`});
-            chrome.action.setTitle({title: `${message.data} RUB/${currencyName}`});
+            chrome.storage.local.get(["lastExchangeRate"]).then(storage => {
+                if (!storage.lastExchangeRate || message.data == storage.lastExchangeRate) chrome.action.setBadgeBackgroundColor({ color:  [0, 0, 0, 0] });
+                else chrome.action.setBadgeBackgroundColor({ color: message.data > storage.lastExchangeRate ? [0, 150, 0, 150] : [255, 0, 0, 255] });
+                chrome.storage.local.set({ lastExchangeRate: message.data });
+            });
+            chrome.action.setBadgeText({ text: `${message.data}` });
+            chrome.action.setTitle({ title: `${message.data} RUB/${config.currencyName}` });
             break;
         default:
             console.warn(`Unexpected message type received: '${message.type}'.`);
@@ -36,7 +36,7 @@ function requestUpdate(callback) {
             type: 'parse-exchange-rate',
             target: 'offscreen',
             data: {
-                code: currencyNumberCode,
+                code: config.currencyNumberCode,
                 text: text
             }
         });
@@ -54,5 +54,8 @@ function update() {
         }, 50);
 }
 
-setInterval(requestUpdate, updateInterval);
-update();
+fetch(chrome.runtime.getURL("/config.json")).then(r => r.text()).then(text => {
+    config = JSON.parse(text);
+    setInterval(requestUpdate, updateInterval);
+    update();
+});

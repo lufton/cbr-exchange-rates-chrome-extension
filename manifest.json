@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Курс EUR-RUB",
-    "description": "Курс обмена EUR-RUB с сайта ЦБ РФ",
+    "name": "Курс USD-RUB",
+    "description": "Курс обмена USD-RUB с сайта ЦБ РФ",
     "version": "1.0",
     "action": {
         "default_icon": "icon.png"
@@ -10,9 +10,14 @@
         "service_worker": "background.js"
     },
     "permissions": [
-        "offscreen"
+        "offscreen",
+        "storage"
     ],
     "host_permissions": [
         "https://www.cbr.ru/scripts/*"
-    ]
+    ],
+    "web_accessible_resources": [{
+        "resources": [ "config.json" ],
+        "use_dynamic_url": true
+    }]
 }
