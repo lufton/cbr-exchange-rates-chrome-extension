@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Курс USD-RUB",
-    "description": "Курс обмена USD-RUB с сайта ЦБ РФ",
+    "name": "Курс EUR-RUB",
+    "description": "Курс обмена EUR-RUB с сайта ЦБ РФ",
     "version": "1.0",
     "action": {
         "default_icon": "icon.png"

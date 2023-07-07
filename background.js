@@ -1,6 +1,6 @@
 const
-    currencyNumberCode = 840;
-    currencyName = "USD"
+    currencyNumberCode = 978;
+    currencyName = "EUR"
     updateInterval = 60 * 60 * 1000;
 
 let lastExchangeRate = 0;
