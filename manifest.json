@@ -10,9 +10,14 @@
         "service_worker": "background.js"
     },
     "permissions": [
-        "offscreen"
+        "offscreen",
+        "storage"
     ],
     "host_permissions": [
         "https://www.cbr.ru/scripts/*"
-    ]
+    ],
+    "web_accessible_resources": [{
+        "resources": [ "config.json" ],
+        "use_dynamic_url": true
+    }]
 }
