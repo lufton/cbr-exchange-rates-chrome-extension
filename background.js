@@ -11,9 +11,10 @@ chrome.runtime.onMessage.addListener(message => {
     switch (message.type) {
         case 'exchange-rate':
             chrome.storage.local.get(["lastExchangeRate"]).then(storage => {
-                if (!storage.lastExchangeRate || message.data == storage.lastExchangeRate) chrome.action.setBadgeBackgroundColor({ color:  [0, 0, 0, 0] });
-                else chrome.action.setBadgeBackgroundColor({ color: message.data > storage.lastExchangeRate ? [0, 150, 0, 150] : [255, 0, 0, 255] });
                 chrome.storage.local.set({ lastExchangeRate: message.data });
+                if (!storage.lastExchangeRate) return;
+                if (message.data > storage.lastExchangeRate) chrome.action.setBadgeBackgroundColor({ color: [0, 150, 0, 150] });
+                else if (message.data < storage.lastExchangeRate) chrome.action.setBadgeBackgroundColor({ color: [255, 0, 0, 255] });
             });
             chrome.action.setBadgeText({ text: `${message.data}` });
             chrome.action.setTitle({ title: `${message.data} RUB/${config.currencyName}` });
