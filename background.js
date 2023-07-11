@@ -32,17 +32,24 @@ chrome.offscreen.createDocument({
 });
 
 function requestUpdate(callback) {
-    fetch("https://www.cbr.ru/scripts/XML_daily.asp").then(r => r.text()).then(text => {
-        chrome.runtime.sendMessage({
-            type: 'parse-exchange-rate',
-            target: 'offscreen',
-            data: {
-                code: config.currencyNumberCode,
-                text: text
-            }
+    fetch("https://www.cbr.ru/scripts/XML_daily.asp")
+        .then(r => r.text())
+        .then(text => {
+            if (callback) callback();
+            chrome.runtime.sendMessage({
+                type: 'parse-exchange-rate',
+                target: 'offscreen',
+                data: {
+                    code: config.currencyNumberCode,
+                    text: text
+                }
+            });
+        }).catch(() => {
+            if (callback) callback();
+            chrome.action.setBadgeBackgroundColor({ color: [0, 0, 0, 0] });
+            chrome.action.setBadgeText({ text: `—` });
+            chrome.action.setTitle({ title: `Ошибка получения данных. Возможно сервер ЦБ РФ недоступен.` });
         });
-        if (callback) callback();
-    });
 }
 
 function update() {
@@ -53,10 +60,13 @@ function update() {
             chrome.action.setBadgeText({text: spinner[frame++ % spinner.length]});
             if (frame === 12) requestUpdate(() => clearInterval(interval));
         }, 50);
+        chrome.action.setTitle({ title: `Запрос данных с сервера ЦБ РФ` });
 }
 
-fetch(chrome.runtime.getURL("/config.json")).then(r => r.text()).then(text => {
-    config = JSON.parse(text);
-    setInterval(requestUpdate, updateInterval);
-    update();
-});
+fetch(chrome.runtime.getURL("/config.json"))
+    .then(r => r.text())
+    .then(text => {
+        config = JSON.parse(text);
+        setInterval(requestUpdate, updateInterval);
+        update();
+    });
